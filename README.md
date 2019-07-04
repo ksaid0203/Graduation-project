@@ -3,3 +3,5 @@
 
 GUI setting :
 python3.6.8
+tkinter
+pillow==6.1.0
