@@ -4,4 +4,4 @@
 GUI setting :
 python3.6.8 \
 tkinter \
-pillow==6.1.0 \
+pillow==6.1.0
