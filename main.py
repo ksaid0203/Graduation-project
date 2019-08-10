@@ -46,5 +46,5 @@ if __name__ == '__main__':
     cv.createTrackbar('penThick',win_name, 10, 15, onChange)
 
     cv.waitKey(0)
-    cv.imwrite("out.png", maskLayer)
+    cv.imwrite("outMask.png", maskLayer)
     cv.destroyAllWindows()
