@@ -47,4 +47,4 @@ if __name__ == '__main__':
 
     cv.waitKey(0)
     cv.imwrite("outMask.png", maskLayer)
-    cv.destroyAllWindows()
+    cv.destroyAllWindows()   
