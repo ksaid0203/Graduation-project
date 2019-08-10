@@ -1,35 +1,50 @@
-import tkinter
-from tkinter import filedialog, Canvas
-from tkinter import *
-from PIL import ImageTk, Image
+import cv2 as cv
+import numpy as np
+from tkinter import Tk, filedialog
 
-ImageName = 'earth.jpg'
+win_name ='Image Recovery'
 
-def UploadAction(event=None):
-    global ImageName
-    ImageName = filedialog.askopenfilename()
-    print('Selected:', ImageName)
+penThick=10
 
-    im = Image.open(ImageName)
-    canvasLeft.image = ImageTk.PhotoImage(im)
-    canvasLeft.create_image(0, 0, image=canvasLeft.image, anchor='nw')
+def onChange(value):
+    global penThick
+    penThick = cv.getTrackbarPos('penThick', win_name)
 
-    canvasRight.image = ImageTk.PhotoImage(im)
-    canvasRight.create_image(0, 0, image=canvasRight.image, anchor='nw')
+    print(penThick)
 
-window = tkinter.Tk()
-window.title("Photo Recover")
-window.geometry("1280x720+300+300")
-window.resizable(False, False)
-button = tkinter.Button(window, text='이미지 불러오기', command=UploadAction)
-print('Selected2:', ImageName)
-button.pack()
+def mouse_callback(event, x, y, flags, param):
+    global srcImage, maskLayer, paintingImage
 
-canvasLeft = Canvas(window, width=400, height=300)
-canvasLeft.pack()
+    if event == cv.EVENT_MOUSEMOVE :
+        if flags & cv.EVENT_LBUTTONDOWN :
+            cv.circle(maskLayer, (x,y), penThick, (0, 0, 0), -1);
+            cv.circle(paintingImage, (x, y), penThick, (0, 0, 0), -1);
 
-canvasRight = Canvas(window, width=400, height=300)
-canvasRight.pack()
+    if event == cv.EVENT_RBUTTONDBLCLK :
+        maskLayer = (255,255,255)
+        paintingImage = cv.imread(image_path, cv.IMREAD_ANYCOLOR)
 
-window.mainloop()
+    cv.imshow(win_name, paintingImage)
 
+
+if __name__ == '__main__':
+    global srcImage, maskLayer, paintingImage
+
+    gui_root = Tk()
+    image_path = filedialog.askopenfilename(initialdir="/", title="Pick an Image", filetypes=(("ImageFiles", "*.jpg"),(" AllFiles", "*.*")))
+    gui_root.destroy()
+
+    srcImage = cv.imread(image_path, cv.IMREAD_ANYCOLOR)
+    paintingImage = cv.imread(image_path, cv.IMREAD_ANYCOLOR)
+
+    maskLayer = np.zeros((srcImage.shape[0], srcImage.shape[1] , 3), np.uint8)
+    maskLayer[:] = (255,255,255)
+
+    cv.namedWindow(win_name, cv.WINDOW_GUI_EXPANDED)
+    cv.imshow(win_name, paintingImage)
+    cv.setMouseCallback(win_name,mouse_callback, (paintingImage, maskLayer))
+    cv.createTrackbar('penThick',win_name, 10, 15, onChange)
+
+    cv.waitKey(0)
+    cv.imwrite("out.png", maskLayer)
+    cv.destroyAllWindows()
