@@ -67,7 +67,7 @@ argparser.add_argument('--testimage_path', type=str,
 args = argparser.parse_args()
 logger.info("args: %s", args)
 
-config.batch_size = 4
+config.batch_size = 32
 
 network = GLCIC(batch_size=config.batch_size, input_shape=config.input_shape,mask_shape=config.mask_shape)
 
@@ -79,7 +79,7 @@ if args.stage == 1:
     model, base_model = network.compile_generator(learning_rate=config.learning_rate)
     train_discriminator = False
     steps_per_epoch = 100
-    epochs = 100
+    epochs = 900
 elif args.stage == 2:
     # discriminator
     model, base_model = network.compile_all(fix_generator_weight=True,learning_rate=config.learning_rate)
@@ -89,7 +89,7 @@ elif args.stage == 2:
 elif args.stage == 3:
     model, base_model = network.compile_all(fix_generator_weight=False,learning_rate=config.learning_rate,d_loss_alpha=config.d_loss_alpha)
     steps_per_epoch = 100
-    epochs = 100
+    epochs = 4000
 
 logger.info(model.summary())
 
